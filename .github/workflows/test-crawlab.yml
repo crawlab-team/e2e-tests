@@ -22,12 +22,12 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+    - name: Install pnpm
+      run: npm i -g pnpm@9
     - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      run: pnpm install
     - name: Run Playwright tests
-      run: npx playwright test
+      run: pnpm playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
