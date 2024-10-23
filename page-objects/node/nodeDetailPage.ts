@@ -42,6 +42,10 @@ export class NodeDetailPage extends DetailLayoutPage<NodeListPage> {
   }
 
   async getCurrentMetrics() {
-    return this.page.locator(this.currentMetricsSelector)?.textContent();
+    return this.page.evaluate((selector) => {
+      const metrics = document.querySelector(selector);
+      if (!metrics) return null;
+      return metrics.textContent?.trim();
+    }, this.currentMetricsSelector);
   }
 }
