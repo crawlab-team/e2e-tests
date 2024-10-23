@@ -1,6 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 import { LoginPage } from '@/page-objects/login/loginPage';
 import userData from '@/fixtures/userData.json';
+
+// Define a new test fixture with a blank storage state
+const test = base.extend({
+  context: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: undefined });
+    await use(context);
+    await context.close();
+  },
+  page: async ({ context }, use) => {
+    const page = await context.newPage();
+    await use(page);
+  },
+});
 
 test.describe('Login Tests', () => {
   let loginPage: LoginPage;

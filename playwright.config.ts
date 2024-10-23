@@ -14,11 +14,15 @@ const headless = process.env.HEADLESS?.toLowerCase() !== 'false' && process.env.
 const timeout = Number(process.env.TIMEOUT) || 30000;
 const workers = process.env.WORKERS ? Number(process.env.WORKERS) : (process.env.CI ? 10 : undefined);
 const retries = process.env.CI ? 2 : 0;
+const storageState = process.env.STORAGE_STATE || '.auth/state.json';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  /* Add global setup */
+  globalSetup: require.resolve('./global-setup'),
+  /* Test directory */
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -43,6 +47,9 @@ export default defineConfig({
 
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Add storage state */
+    storageState,
   },
 
   /* Configure timeout */
@@ -91,5 +98,5 @@ export default defineConfig({
   //   command: 'npm run start',
   //   url: 'http://127.0.0.1:3000',
   //   reuseExistingServer: !process.env.CI,
-  // },
+  // }
 });

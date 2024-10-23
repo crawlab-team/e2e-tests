@@ -22,8 +22,11 @@ export default abstract class NormalLayoutPage {
   }
 
   private async checkLoginStatus(): Promise<boolean> {
+    if (this.page.url().includes('login')) {
+      return false;
+    }
     return await this.page.evaluate(() => {
-      const token = localStorage.getItem('jwt_token');
+      const token = localStorage.getItem('token');
       return !!token;
     });
   }
@@ -31,19 +34,9 @@ export default abstract class NormalLayoutPage {
   private async performLogin() {
     await this.loginPage.navigate();
     await this.loginPage.login(userData.adminUser.username, userData.adminUser.password);
-    // After successful login, store the JWT token
-    await this.storeJwtToken();
-  }
 
-  private async storeJwtToken() {
-    // Assuming the JWT token is stored in localStorage after login
-    // You may need to adjust this based on your actual implementation
-    await this.page.evaluate(() => {
-      const token = localStorage.getItem('your_jwt_token_key');
-      if (token) {
-        localStorage.setItem('jwt_token', token);
-      }
-    });
+    // Save the storage state to avoid logging in for each test
+    await this.page.context().storageState({ path: process.env.STORAGE_STATE || '.auth/state.json' });
   }
 
   abstract waitForPageLoad(): Promise<void>;
