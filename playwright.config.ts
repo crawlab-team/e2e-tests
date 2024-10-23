@@ -16,13 +16,6 @@ const workers = process.env.WORKERS ? Number(process.env.WORKERS) : (process.env
 const retries = process.env.CI ? 2 : 0;
 const storageState = process.env.STORAGE_STATE || '.auth/state.json';
 
-console.info('Running tests with the following configuration:');
-console.info(`HEADLESS: ${headless}`);
-console.info(`TIMEOUT: ${timeout}`);
-console.info(`WORKERS: ${workers}`);
-console.info(`RETRIES: ${retries}`);
-console.info(`STORAGE_STATE: ${storageState}`);
-
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
