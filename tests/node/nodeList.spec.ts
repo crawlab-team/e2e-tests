@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { NodeListPage } from '@/page-objects/node/nodeListPage';
+import { NodeListPage } from '@/page-objects/views/node/nodeListPage';
 
 test.describe('Node List Tests', () => {
   let nodeListPage: NodeListPage;

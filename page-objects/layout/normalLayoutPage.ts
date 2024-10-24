@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { LoginPage } from '@/page-objects/login/loginPage';
+import { LoginPage } from '@/page-objects/views/login/loginPage';
 import userData from '@/fixtures/userData.json';
 
 export default abstract class NormalLayoutPage {

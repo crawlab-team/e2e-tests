@@ -5,10 +5,12 @@ export default abstract class ListLayoutPage<T> extends NormalLayoutPage {
 
   protected listContainer = '.list-layout';
   protected createButton = '#add-btn';
+  protected confirmButton = '#confirm-btn';
   protected searchInput = '#filter-search .el-input input';
   protected tableRows = '.list-layout table tbody tr';
   protected viewButton = '.view-btn';
   protected deleteButton = '.delete-btn';
+  protected deleteConfirmButton = '.delete-confirm-btn';
 
   async navigate() {
     await super.navigate();
@@ -33,9 +35,14 @@ export default abstract class ListLayoutPage<T> extends NormalLayoutPage {
     await this.page.click(this.createButton);
   }
 
+  async confirm() {
+    await this.page.click(this.confirmButton);
+  }
+
   async deleteRow(rowIndex: number) {
     const row = this.page.locator(this.tableRows).nth(rowIndex);
     await row.locator(this.deleteButton).click();
+    await this.page.click(this.deleteConfirmButton);
   }
 
   async getTableRowCount(): Promise<number> {

@@ -1,5 +1,5 @@
 import { chromium, FullConfig } from '@playwright/test';
-import { LoginPage } from './page-objects/login/loginPage';
+import { LoginPage } from '@/page-objects/views/login/loginPage';
 import userData from './fixtures/userData.json';
 
 async function globalSetup(config: FullConfig) {
@@ -7,8 +7,8 @@ async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
   const loginPage = new LoginPage(page);
-  
-  await page.goto(baseURL + '/#/login');
+
+  await page.goto(baseURL + '/#/login', { waitUntil: 'domcontentloaded' });
   await loginPage.login(userData.adminUser.username, userData.adminUser.password);
   
   await page.context().storageState({ path: storageState as string });

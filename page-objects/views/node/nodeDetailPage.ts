@@ -1,4 +1,4 @@
-import { NodeListPage } from '@/page-objects/node/nodeListPage';
+import { NodeListPage } from '@/page-objects/views/node/nodeListPage';
 import DetailLayoutPage from '@/page-objects/layout/detailLayoutPage';
 
 export class NodeDetailPage extends DetailLayoutPage<Node, NodeListPage> {

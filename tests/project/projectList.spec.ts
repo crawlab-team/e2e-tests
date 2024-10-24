@@ -1,38 +1,20 @@
 import { test, expect } from '@playwright/test';
-import { ProjectListPage } from '@/page-objects/project/projectListPage';
+import { ProjectListPage } from '@/page-objects/views/project/projectListPage';
+import { ProjectFormPage } from '@/page-objects/views/project/projectFormPage';
 
-test.describe.skip('Project List Tests', () => {
+test.describe('Project List Tests', () => {
   let projectListPage: ProjectListPage;
+  let projectFormPage: ProjectFormPage;
 
   test.beforeEach(async ({ page }) => {
     projectListPage = new ProjectListPage(page);
+    projectFormPage = new ProjectFormPage(page);
     await projectListPage.navigate();
   });
 
   test('should display the project list', async () => {
     const projectCount = await projectListPage.getTableRowCount();
     expect(projectCount).toBeGreaterThanOrEqual(0);
-  });
-
-  test('should create a new project', async ({ page }) => {
-    const initialCount = await projectListPage.getTableRowCount();
-    await projectListPage.clickCreate();
-
-    // Here you would interact with the create project dialog
-    // For this example, we'll assume the dialog is handled elsewhere
-    // and just check that the button click worked
-
-    await page.waitForSelector('.el-dialog');
-    const dialogVisible = await page.isVisible('.el-dialog');
-    expect(dialogVisible).toBe(true);
-
-    // Close the dialog
-    await page.click('.el-dialog__close');
-
-    // In a real scenario, you'd fill out the form and submit it
-    // Then you'd verify the new project appears in the list
-    // const newCount = await projectListPage.getProjectCount();
-    // expect(newCount).toBe(initialCount + 1);
   });
 
   test('should search for a project', async ({ page }) => {
@@ -54,7 +36,7 @@ test.describe.skip('Project List Tests', () => {
     const projectCount = await projectListPage.getTableRowCount();
     if (projectCount > 0) {
       await projectListPage.navigateToDetail(0);
-      await page.waitForNavigation();
+      await page.waitForSelector('.detail-layout');
       expect(page.url()).toContain('/projects/');
     } else {
       // If no projects, skip this test
@@ -62,22 +44,65 @@ test.describe.skip('Project List Tests', () => {
     }
   });
 
-  test('should delete a project', async ({ page }) => {
-    const projectCount = await projectListPage.getTableRowCount();
-    if (projectCount > 0) {
-      const initialCount = projectCount;
-      await projectListPage.deleteRow(0);
+  test('should verify project form placeholders', async () => {
+    await projectListPage.clickCreate();
 
-      // Assume there's a confirmation dialog
-      await page.click('.el-message-box__btns .el-button--primary');
+    const namePlaceholder = await projectFormPage.getNamePlaceholder();
+    const descriptionPlaceholder = await projectFormPage.getDescriptionPlaceholder();
 
-      await page.waitForTimeout(1000); // Wait for deletion to process
+    expect(namePlaceholder).toBe('Name' || '名称');
+    expect(descriptionPlaceholder).toBe('Description' || '描述');
+  });
+
+  test('should verify project form field states', async () => {
+    await projectListPage.clickCreate();
+
+    const isNameDisabled = await projectFormPage.isNameInputDisabled();
+    const isDescriptionDisabled = await projectFormPage.isDescriptionInputDisabled();
+
+    expect(isNameDisabled).toBe(false);
+    expect(isDescriptionDisabled).toBe(false);
+  });
+
+  // Sequential tests for create and delete
+  test.describe.serial('Create and Delete Tests', () => {
+    test('should create a new project', async ({ page }) => {
+      const initialCount = await projectListPage.getTableRowCount();
+      await projectListPage.clickCreate();
+
+      // Fill out the project form
+      const projectName = 'Test Project';
+      const projectDescription = 'This is a test project';
+      await projectFormPage.fillProjectForm(projectName, projectDescription);
+
+      // Submit the form (you might need to implement this method in ProjectListPage)
+      await projectListPage.confirm();
+
+      // Wait for the new project to appear in the list
+      await page.waitForTimeout(1000);
+
       const newCount = await projectListPage.getTableRowCount();
-      expect(newCount).toBe(initialCount - 1);
-    } else {
-      // If no projects, skip this test
-      test.skip();
-    }
+      expect(newCount).toBe(initialCount + 1);
+
+      // Verify the new project appears in the list
+      const lastProjectData = await projectListPage.getTableRow(newCount - 1);
+      expect(lastProjectData.name).toBe(projectName);
+      expect(lastProjectData.description).toBe(projectDescription);
+    });
+
+    test('should delete a project', async ({ page }) => {
+      const projectCount = await projectListPage.getTableRowCount();
+      if (projectCount > 0) {
+        const initialCount = projectCount;
+        await projectListPage.deleteRow(0);
+
+        await page.waitForTimeout(1000); // Wait for deletion to process
+        const newCount = await projectListPage.getTableRowCount();
+        expect(newCount).toBe(initialCount - 1);
+      } else {
+        // If no projects, skip this test
+        test.skip();
+      }
+    });
   });
 });
-

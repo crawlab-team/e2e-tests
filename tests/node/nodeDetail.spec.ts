@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { NodeDetailPage } from '@/page-objects/node/nodeDetailPage';
+import { NodeDetailPage } from '@/page-objects/views/node/nodeDetailPage';
 
 test.describe('Node Detail Page', () => {
   let nodeDetailPage: NodeDetailPage;
