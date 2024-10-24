@@ -22,7 +22,7 @@ test.describe('Node List Tests', () => {
     const nodeCount = await nodeListPage.getNodeCount();
     expect(nodeCount).toBeGreaterThan(0);
 
-    const firstNodeData = await nodeListPage.getNodeData(0);
+    const firstNodeData = await nodeListPage.getTableRow(0);
     expect(firstNodeData.type).toContain('Master' || '主节点');
   });
 
@@ -32,26 +32,26 @@ test.describe('Node List Tests', () => {
     const nodeCount = await nodeListPage.getNodeCount();
     expect(nodeCount).toBeGreaterThan(0);
 
-    const firstNodeData = await nodeListPage.getNodeData(0);
+    const firstNodeData = await nodeListPage.getTableRow(0);
     expect(firstNodeData.status).toBe('Online' || '在线');
   });
 
   test('should search for a node by name', async ({ page }) => {
-    const { name } = await nodeListPage.getNodeData(0);
+    const { name } = await nodeListPage.getTableRow(0);
     const searchTerm = name;
-    await nodeListPage.searchNode(searchTerm);
+    await nodeListPage.searchRows(searchTerm);
     await page.waitForTimeout(1000); // Add a 1-second wait
 
     const nodeCount = await nodeListPage.getNodeCount();
     expect(nodeCount).toBe(1);
 
-    const firstNodeData = await nodeListPage.getNodeData(0);
+    const firstNodeData = await nodeListPage.getTableRow(0);
     expect(firstNodeData.name).toContain(searchTerm);
   });
 
   test('should search for a non-existent node', async ({ page }) => {
     const searchTerm = 'Non-Existent Node';
-    await nodeListPage.searchNode(searchTerm);
+    await nodeListPage.searchRows(searchTerm);
     await page.waitForTimeout(1000); // Add a 1-second wait
 
     const nodeCount = await nodeListPage.getNodeCount();

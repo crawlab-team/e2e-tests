@@ -2,10 +2,10 @@ import { Page } from '@playwright/test';
 import ListLayoutPage from '@/page-objects/layout/listLayoutPage';
 import NormalLayoutPage from '@/page-objects/layout/normalLayoutPage';
 
-export default abstract class DetailLayoutPage<T extends ListLayoutPage> extends NormalLayoutPage {
-  private listPage: T;
+export default abstract class DetailLayoutPage<T, L extends ListLayoutPage<T>> extends NormalLayoutPage {
+  private listPage: L;
 
-  protected abstract getListPage(): T;
+  protected abstract getListPage(): L;
 
   constructor(page: Page) {
     super(page);

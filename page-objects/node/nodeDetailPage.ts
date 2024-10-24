@@ -1,7 +1,7 @@
 import { NodeListPage } from '@/page-objects/node/nodeListPage';
 import DetailLayoutPage from '@/page-objects/layout/detailLayoutPage';
 
-export class NodeDetailPage extends DetailLayoutPage<NodeListPage> {
+export class NodeDetailPage extends DetailLayoutPage<Node, NodeListPage> {
   private nameField = '.form-item[data-test="name"] input';
   private typeSelector = '.form-item[data-test="type"] .el-tag';
   private enabledSwitch = '.form-item[data-test="enabled"] .el-switch__input';
@@ -10,7 +10,7 @@ export class NodeDetailPage extends DetailLayoutPage<NodeListPage> {
   private currentMetricsSelector = '.current-metrics';
   private monitoringTabSelector = '.nav-tabs [data-test="monitoring"]';
 
-  getListPage(): NodeListPage {
+  getListPage() {
     return new NodeListPage(this.page);
   }
 

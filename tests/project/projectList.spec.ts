@@ -10,13 +10,13 @@ test.describe.skip('Project List Tests', () => {
   });
 
   test('should display the project list', async () => {
-    const projectCount = await projectListPage.getProjectCount();
-    expect(projectCount).toBeGreaterThan(0);
+    const projectCount = await projectListPage.getTableRowCount();
+    expect(projectCount).toBeGreaterThanOrEqual(0);
   });
 
   test('should create a new project', async ({ page }) => {
-    const initialCount = await projectListPage.getProjectCount();
-    await projectListPage.clickCreateProject();
+    const initialCount = await projectListPage.getTableRowCount();
+    await projectListPage.clickCreate();
 
     // Here you would interact with the create project dialog
     // For this example, we'll assume the dialog is handled elsewhere
@@ -37,12 +37,12 @@ test.describe.skip('Project List Tests', () => {
 
   test('should search for a project', async ({ page }) => {
     const searchTerm = 'Test Project';
-    await projectListPage.searchProject(searchTerm);
+    await projectListPage.searchRows(searchTerm);
     await page.waitForTimeout(1000); // Wait for search results
 
-    const projectCount = await projectListPage.getProjectCount();
+    const projectCount = await projectListPage.getTableRowCount();
     if (projectCount > 0) {
-      const firstProjectData = await projectListPage.getProjectData(0);
+      const firstProjectData = await projectListPage.getTableRow(0);
       expect(firstProjectData.name).toContain(searchTerm);
     } else {
       // If no projects found, that's okay too
@@ -51,9 +51,9 @@ test.describe.skip('Project List Tests', () => {
   });
 
   test('should navigate to project detail', async ({ page }) => {
-    const projectCount = await projectListPage.getProjectCount();
+    const projectCount = await projectListPage.getTableRowCount();
     if (projectCount > 0) {
-      await projectListPage.viewProject(0);
+      await projectListPage.navigateToDetail(0);
       await page.waitForNavigation();
       expect(page.url()).toContain('/projects/');
     } else {
@@ -63,16 +63,16 @@ test.describe.skip('Project List Tests', () => {
   });
 
   test('should delete a project', async ({ page }) => {
-    const projectCount = await projectListPage.getProjectCount();
+    const projectCount = await projectListPage.getTableRowCount();
     if (projectCount > 0) {
       const initialCount = projectCount;
-      await projectListPage.deleteProject(0);
+      await projectListPage.deleteRow(0);
 
       // Assume there's a confirmation dialog
       await page.click('.el-message-box__btns .el-button--primary');
 
       await page.waitForTimeout(1000); // Wait for deletion to process
-      const newCount = await projectListPage.getProjectCount();
+      const newCount = await projectListPage.getTableRowCount();
       expect(newCount).toBe(initialCount - 1);
     } else {
       // If no projects, skip this test

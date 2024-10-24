@@ -1,6 +1,6 @@
 import NormalLayoutPage from '@/page-objects/layout/normalLayoutPage';
 
-export default abstract class ListLayoutPage extends NormalLayoutPage {
+export default abstract class ListLayoutPage<T> extends NormalLayoutPage {
   protected abstract path: string;
 
   protected listContainer = '.list-layout';
@@ -8,6 +8,7 @@ export default abstract class ListLayoutPage extends NormalLayoutPage {
   protected searchInput = '#filter-search .el-input input';
   protected tableRows = '.list-layout table tbody tr';
   protected viewButton = '.view-btn';
+  protected deleteButton = '.delete-btn';
 
   async navigate() {
     await super.navigate();
@@ -23,4 +24,23 @@ export default abstract class ListLayoutPage extends NormalLayoutPage {
     const row = this.page.locator(this.tableRows).nth(rowIndex);
     await row.locator(this.viewButton).click();
   }
+
+  async searchRows(searchTerm: string) {
+    await this.page.fill(this.searchInput, searchTerm);
+  }
+
+  async clickCreate() {
+    await this.page.click(this.createButton);
+  }
+
+  async deleteRow(rowIndex: number) {
+    const row = this.page.locator(this.tableRows).nth(rowIndex);
+    await row.locator(this.deleteButton).click();
+  }
+
+  async getTableRowCount(): Promise<number> {
+    return await this.page.locator(this.tableRows).count();
+  }
+
+  abstract getTableRow(rowIndex: number): Promise<T>;
 }
