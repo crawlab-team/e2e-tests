@@ -32,18 +32,6 @@ test.describe('Project List Tests', () => {
     }
   });
 
-  test('should navigate to project detail', async ({ page }) => {
-    const projectCount = await projectListPage.getTableRowCount();
-    if (projectCount > 0) {
-      await projectListPage.navigateToDetail(0);
-      await page.waitForSelector('.detail-layout');
-      expect(page.url()).toContain('/projects/');
-    } else {
-      // If no projects, skip this test
-      test.skip();
-    }
-  });
-
   test('should verify project form placeholders', async () => {
     await projectListPage.clickCreate();
 
@@ -90,19 +78,23 @@ test.describe('Project List Tests', () => {
       expect(lastProjectData.description).toBe(projectDescription);
     });
 
+    test('should navigate to project detail', async ({ page }) => {
+      const projectCount = await projectListPage.getTableRowCount();
+      expect(projectCount).toBeGreaterThan(0);
+      await projectListPage.navigateToDetail(0);
+      await page.waitForSelector('.detail-layout');
+      expect(page.url()).toMatch(/\/projects\/[0-9a-f]{24}/);
+    });
+
     test('should delete a project', async ({ page }) => {
       const projectCount = await projectListPage.getTableRowCount();
-      if (projectCount > 0) {
-        const initialCount = projectCount;
-        await projectListPage.deleteRow(0);
+      expect(projectCount).toBeGreaterThan(0);
+      const initialCount = projectCount;
+      await projectListPage.deleteRow(0);
 
-        await page.waitForTimeout(1000); // Wait for deletion to process
-        const newCount = await projectListPage.getTableRowCount();
-        expect(newCount).toBe(initialCount - 1);
-      } else {
-        // If no projects, skip this test
-        test.skip();
-      }
+      await page.waitForTimeout(1000); // Wait for deletion to process
+      const newCount = await projectListPage.getTableRowCount();
+      expect(newCount).toBe(initialCount - 1);
     });
   });
 });
