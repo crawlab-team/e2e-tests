@@ -20,11 +20,6 @@ export class NodeListPage extends ListLayoutPage<Node> {
     await this.selectOption(this.nodeEnabledFilter, enabled);
   }
 
-  private async selectOption(selector: string, value: string) {
-    await this.page.click(selector);
-    await this.page.click(`.el-select-dropdown [data-test="${value}"]`);
-  }
-
   // Getters
   async getNodeCount(): Promise<number> {
     return await this.page.locator(this.tableRows).count();

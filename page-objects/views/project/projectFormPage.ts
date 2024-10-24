@@ -1,12 +1,6 @@
-import { Page } from '@playwright/test';
+import BaseLayoutPage from '@/page-objects/layout/baseLayoutPage';
 
-export class ProjectFormPage {
-  private page: Page;
-
-  constructor(page: Page) {
-    this.page = page;
-  }
-
+export class ProjectFormPage extends BaseLayoutPage {
   // Locators
   private nameInput = '[data-test="name"] input';
   private descriptionTextarea = '[data-test="description"] textarea';

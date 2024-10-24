@@ -1,13 +1,13 @@
 import { Page } from '@playwright/test';
 import { LoginPage } from '@/page-objects/views/login/loginPage';
 import userData from '@/fixtures/userData.json';
+import BaseLayoutPage from '@/page-objects/layout/baseLayoutPage';
 
-export default abstract class NormalLayoutPage {
-  protected page: Page;
+export default abstract class NormalLayoutPage extends BaseLayoutPage {
   protected loginPage: LoginPage;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.loginPage = new LoginPage(page);
   }
 
