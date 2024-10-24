@@ -1,5 +1,5 @@
-# Use the official Playwright image
-FROM mcr.microsoft.com/playwright:v1.42.1-jammy
+# Use the official Playwright image with the latest version
+FROM mcr.microsoft.com/playwright:v1.48.1-jammy
 
 # Set the working directory in the container
 WORKDIR /app
