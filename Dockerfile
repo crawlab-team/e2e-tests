@@ -4,6 +4,9 @@ FROM mcr.microsoft.com/playwright:v1.48.1-jammy
 # Set the working directory in the container
 WORKDIR /app
 
+# Set environment variables
+ENV CI=true
+
 # Install pnpm
 RUN npm install -g pnpm
 
