@@ -6,6 +6,10 @@
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
+    "test:sanity": "npx playwright test --grep \"@critical\"",
+    "test:normal": "npx playwright test --grep \"@critical|@high\"",
+    "test:extended": "npx playwright test --grep \"@critical|@high|@medium\"",
+    "test:full": "npm run test",
     "test:headed": "npx playwright test --headed",
     "test:debug": "npx playwright test --debug"
   },

@@ -1,6 +1,7 @@
 import { test as base, expect } from '@playwright/test';
 import { LoginPage } from '@/page-objects/views/login/loginPage';
 import userData from '@/fixtures/userData.json';
+import { TAG_PRIORITY_CRITICAL } from '@/constants/priority';
 
 // Define a new test fixture with a blank storage state
 const test = base.extend({
@@ -15,7 +16,7 @@ const test = base.extend({
   },
 });
 
-test.describe('Login Tests', () => {
+test.describe('Login Tests', { tag: TAG_PRIORITY_CRITICAL }, () => {
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {

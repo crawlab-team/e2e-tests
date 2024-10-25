@@ -1,11 +1,12 @@
 import BaseLayoutPage from '@/page-objects/layout/baseLayoutPage';
+import { FormPage } from '@/page-objects/components/form/formPage';
 
-export class ProjectFormPage extends BaseLayoutPage {
+export class ProjectFormPage extends FormPage<Project> {
   // Locators
   private nameInput = '[data-test="name"] input';
   private descriptionTextarea = '[data-test="description"] textarea';
 
-  async fillProjectForm(name: string, description: string) {
+  async fillForm({name, description}: Project) {
     await this.setName(name);
     await this.setDescription(description);
   }

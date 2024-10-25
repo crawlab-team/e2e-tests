@@ -1,6 +1,6 @@
-import BaseLayoutPage from '@/page-objects/layout/baseLayoutPage';
+import { FormPage } from '@/page-objects/components/form/formPage';
 
-export class SpiderFormPage extends BaseLayoutPage {
+export class SpiderFormPage extends FormPage<Spider> {
   // Locators
   private nameInput = '[data-test="name"] input';
   private projectSelect = '[data-test="project_id"] .el-select';
@@ -13,7 +13,7 @@ export class SpiderFormPage extends BaseLayoutPage {
   private nodeCheckTagGroup = '[data-test="nodes"] .cl-check-tag-group';
   private descriptionTextarea = '[data-test="description"] textarea';
 
-  async fillSpiderForm(name: string, project: string, cmd: string, description: string) {
+  async fillForm({name, project, cmd, description}: Spider) {
     await this.setName(name);
     await this.setProject(project);
     await this.setCommand(cmd);

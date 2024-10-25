@@ -1,7 +1,12 @@
 import ListLayoutPage from '@/page-objects/layout/listLayoutPage';
+import { SpiderFormPage } from '@/page-objects/views/spider/spiderFormPage';
 
 export class SpiderListPage extends ListLayoutPage<Spider> {
   protected path = '/#/spiders';
+
+  getFormPage() {
+    return new SpiderFormPage(this.page);
+  }
 
   // Locators
   private nameColumn = '.name';
@@ -32,15 +37,21 @@ export class SpiderListPage extends ListLayoutPage<Spider> {
     return await this.page.isVisible('[custom-class*="upload-files-dialog"]');
   }
 
-  async runSpider(rowIndex: number) {
+  async clickRunSpider(rowIndex: number) {
     await this.page.locator(this.tableRows).nth(rowIndex).locator(this.runButton).click();
   }
 
-  async uploadFiles(rowIndex: number) {
+  async runSpider(rowIndex: number) {
+    await this.clickRunSpider(rowIndex);
+    await this.page.waitForSelector(this.confirmButton);
+    await this.confirm();
+  }
+
+  async clickUploadFiles(rowIndex: number) {
     await this.page.locator(this.tableRows).nth(rowIndex).locator(this.uploadFilesButton).click();
   }
 
-  async viewData(rowIndex: number) {
+  async clickViewData(rowIndex: number) {
     await this.page.locator(this.tableRows).nth(rowIndex).locator(this.viewDataButton).click();
   }
 

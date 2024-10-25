@@ -12,7 +12,7 @@ export class LoginPage {
   }
 
   async navigate() {
-    await this.page.goto('/#/login');
+    await this.page.goto('/#/login', { waitUntil: 'domcontentloaded' });
     await this.waitForPageLoad();
   }
 

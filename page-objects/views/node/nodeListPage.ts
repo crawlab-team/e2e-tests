@@ -1,7 +1,12 @@
 import ListLayoutPage from '@/page-objects/layout/listLayoutPage';
+import { NodeFormPage } from '@/page-objects/views/node/nodeFormPage';
 
 export class NodeListPage extends ListLayoutPage<Node> {
   protected path = '/#/nodes';
+
+  getFormPage() {
+    return new NodeFormPage(this.page);
+  }
 
   // Updated Locators
   private nodeTypeFilter = '#filter-select-type .el-select';

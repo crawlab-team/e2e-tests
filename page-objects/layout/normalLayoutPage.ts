@@ -6,7 +6,7 @@ import BaseLayoutPage from '@/page-objects/layout/baseLayoutPage';
 export default abstract class NormalLayoutPage extends BaseLayoutPage {
   protected loginPage: LoginPage;
 
-  constructor(page: Page) {
+  protected constructor(page: Page) {
     super(page);
     this.loginPage = new LoginPage(page);
   }

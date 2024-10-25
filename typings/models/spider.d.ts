@@ -7,5 +7,6 @@ export declare global {
     last_run_ts: string;
     stats: string;
     description: string;
+    cmd: string;
   }
 }
