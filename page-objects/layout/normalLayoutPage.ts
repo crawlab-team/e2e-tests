@@ -14,7 +14,7 @@ export default abstract class NormalLayoutPage extends BaseLayoutPage {
   protected edition = '.sidebar .logo-sub-title .logo-sub-title-block:nth-child(1)';
 
   async navigate() {
-    await this.page.goto('/'); // Navigate to the base URL
+    await this.page.goto('/', { waitUntil: 'domcontentloaded' }); // Navigate to the base URL
     const isLoggedIn = await this.checkLoginStatus();
     if (!isLoggedIn) {
       await this.performLogin();

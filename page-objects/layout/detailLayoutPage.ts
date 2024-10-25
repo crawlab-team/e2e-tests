@@ -18,7 +18,6 @@ export default abstract class DetailLayoutPage<T, L extends ListLayoutPage<T>> e
   protected activeTabSelector = '.nav-tabs .el-menu-item.is-active';
 
   async navigate(rowIndex?: number) {
-    await super.navigate();
     await this.listPage.navigate();
     await this.listPage.navigateToDetail(rowIndex || 0);
     await this.waitForPageLoad();
