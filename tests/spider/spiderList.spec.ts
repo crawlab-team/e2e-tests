@@ -1,14 +1,22 @@
 import { test, expect } from '@playwright/test';
-import { SpiderListPage } from '@/page-objects/views/spider/spiderListPage';
-import spiderData from '@/fixtures/spiderData.json';
 import { TAG_PRIORITY_CRITICAL, TAG_PRIORITY_HIGH, TAG_PRIORITY_MEDIUM } from '@/constants/priority';
 import { CATEGORY_CREATE_DELETE_ROW, CATEGORY_FILTER_ROWS, CATEGORY_ROW_ACTIONS } from '@/constants/category';
+import spiderData from '@/fixtures/spiderData.json';
+import { SpiderListPage } from '@/page-objects/views/spider/spiderListPage';
+import { FileUploadPage } from '@/page-objects/components/file/fileUploadPage';
+import path from 'path';
+import projectData from '@/fixtures/projectData.json';
+import { ProjectListPage } from '@/page-objects/views/project/projectListPage';
 
 test.beforeAll(async ({ browser }) => {
   const page = await browser.newPage();
   const spiderListPage = new SpiderListPage(page);
   await spiderListPage.navigate();
   await spiderListPage.createRow(spiderData.single as Spider);
+
+  // Create a project to associate with the spider
+  const projectListPage = new ProjectListPage(page);
+  await projectListPage.createRow(projectData.single as Project);
 });
 
 test.describe('Spider List Tests', () => {
@@ -86,20 +94,63 @@ test.describe('Spider List Tests', () => {
       expect(page.url()).toMatch(/\/spiders\/[0-9a-f]{24}/);
     });
 
-    test('should open upload files dialog', async ({ page }) => {
-      const spiderCount = await spiderListPage.getTableRowCount();
-      expect(spiderCount).toBeGreaterThan(0);
-      await spiderListPage.clickUploadFiles(0);
-      const isUploadDialogVisible = await spiderListPage.isUploadSpiderFilesDialogVisible();
-      expect(isUploadDialogVisible).toBe(true);
-    });
-
     test('should navigate to spider data view', async ({ page }) => {
       const spiderCount = await spiderListPage.getTableRowCount();
       expect(spiderCount).toBeGreaterThan(0);
       await spiderListPage.clickViewData(0);
       await page.waitForSelector('.detail-layout');
       expect(page.url()).toMatch(/\/spiders\/[0-9a-f]{24}\/data/);
+    });
+
+    test('should open upload files dialog and interact with upload component', async ({ page }) => {
+      const fileUploadPage = new FileUploadPage(page);
+      const spiderCount = await spiderListPage.getTableRowCount();
+      expect(spiderCount).toBeGreaterThan(0);
+
+      // Open the upload dialog
+      await spiderListPage.clickUploadFiles(0);
+      const isUploadDialogVisible = await spiderListPage.isUploadSpiderFilesDialogVisible();
+      expect(isUploadDialogVisible).toBe(true);
+
+      // Test file upload component functionality
+      await fileUploadPage.selectMode('folder');
+      await fileUploadPage.expectModeToBeSelected('folder');
+    });
+
+    test('should upload folders correctly', async ({ page }) => {
+      const fileUploadPage = new FileUploadPage(page);
+
+      // Open the upload dialog
+      await spiderListPage.clickUploadFiles(0);
+
+      // Upload an entire folder
+      const testFolder = path.join(__dirname, '../../fixtures/test-files/config');
+      await fileUploadPage.selectMode('folder');
+      await fileUploadPage.uploadFolder(testFolder);
+      // Verify folder contents appear in the tree
+      await fileUploadPage.expectUploadedFilesToContain('project.json');
+      await fileUploadPage.expectUploadedFilesToContain('config.json');
+
+      // Confirm the upload
+      await spiderListPage.confirm();
+    });
+
+    test('should upload files correctly', async ({ page }) => {
+      const fileUploadPage = new FileUploadPage(page);
+
+      // Open the upload dialog
+      await spiderListPage.clickUploadFiles(0);
+
+      // Upload individual files
+      const testFiles = [
+        path.join(__dirname, '../../fixtures/test-files/main.py'),
+        path.join(__dirname, '../../fixtures/test-files/requirements.txt'),
+      ];
+      await fileUploadPage.selectMode('files');
+      await fileUploadPage.uploadFiles(testFiles);
+      // Verify files appear in the tree
+      await fileUploadPage.expectUploadedFilesToContain('main.py');
+      await fileUploadPage.expectUploadedFilesToContain('requirements.txt');
     });
   });
 
