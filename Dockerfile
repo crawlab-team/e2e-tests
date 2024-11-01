@@ -19,5 +19,6 @@ RUN pnpm install --frozen-lockfile
 # Copy the rest of the application code
 COPY . .
 
-# Set the command to run Playwright tests
-CMD ["pnpm", "exec", "playwright", "test"]
+# Set the command to run tests
+# Use TEST_SCRIPT to specify which test script to run (e.g., test:normal, test:extended, test:full)
+CMD pnpm run ${TEST_SCRIPT:-test:normal}
