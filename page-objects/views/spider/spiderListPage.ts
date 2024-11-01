@@ -23,8 +23,11 @@ export class SpiderListPage extends ListLayoutPage<Spider> {
   private viewDataButton = '.view-data-btn';
   private projectFilterSelector = '#filter-select-project';
 
-  async filterByProject(projectName: string) {
+  async filterByProject(projectName: string, wait = 1000) {
     await this.selectOptionByText(this.projectFilterSelector, projectName);
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
   }
 
   async isUploadSpiderFilesDialogVisible() {
@@ -49,16 +52,19 @@ export class SpiderListPage extends ListLayoutPage<Spider> {
   async clickViewTasks(rowIndex: number) {
     await this.clickShowMore(rowIndex);
     await this.clickContextMenuItem(this.viewTasksButton);
+    await this.waitForDetailPageLoad();
   }
 
   async clickViewSchedules(rowIndex: number) {
     await this.clickShowMore(rowIndex);
     await this.clickContextMenuItem(this.viewSchedulesButton);
+    await this.waitForDetailPageLoad();
   }
 
   async clickViewData(rowIndex: number) {
     await this.clickShowMore(rowIndex);
     await this.clickContextMenuItem(this.viewDataButton);
+    await this.waitForDetailPageLoad();
   }
 
   async getTableRow(rowIndex: number) {

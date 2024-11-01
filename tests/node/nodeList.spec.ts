@@ -16,15 +16,13 @@ test.describe('Node List Tests', () => {
   test.describe(CATEGORY_ROW_ACTIONS, { tag: TAG_PRIORITY_HIGH }, () => {
     test('should navigate to the node details page', async ({ page }) => {
       await nodeListPage.navigateToDetail(0);
-      await page.waitForSelector('.detail-layout');
       expect(page.url()).toMatch(/\/nodes\/[0-9a-f]{24}/);
     });
   });
 
   test.describe(CATEGORY_FILTER_ROWS, { tag: TAG_PRIORITY_MEDIUM }, () => {
-    test('should filter nodes by type', async ({ page }) => {
+    test('should filter nodes by type', async () => {
       await nodeListPage.filterByNodeType('true');
-      await page.waitForTimeout(1000); // Add a 1-second wait
       const nodeCount = await nodeListPage.getNodeCount();
       expect(nodeCount).toBeGreaterThan(0);
 
@@ -34,7 +32,6 @@ test.describe('Node List Tests', () => {
 
     test('should filter nodes by status', async ({ page }) => {
       await nodeListPage.filterByNodeStatus('on');
-      await page.waitForTimeout(1000); // Add a 1-second wait
       const nodeCount = await nodeListPage.getNodeCount();
       expect(nodeCount).toBeGreaterThan(0);
 
@@ -58,7 +55,6 @@ test.describe('Node List Tests', () => {
     test('should search for a non-existent node', async ({ page }) => {
       const searchTerm = 'Non-Existent Node';
       await nodeListPage.searchRows(searchTerm);
-      await page.waitForTimeout(1000); // Add a 1-second wait
 
       const nodeCount = await nodeListPage.getNodeCount();
       expect(nodeCount).toBe(0);

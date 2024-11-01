@@ -13,6 +13,7 @@ export class ProjectListPage extends ListLayoutPage<Project> {
   private nameColumn = 'td:nth-child(2)';
   private spidersColumn = 'td:nth-child(3)';
   private descriptionColumn = 'td:nth-child(4)';
+  private viewSpidersButton = '.view-spiders-btn';
 
   async getTableRow(rowIndex: number) {
     const row = this.page.locator(this.tableRows).nth(rowIndex);
@@ -21,6 +22,12 @@ export class ProjectListPage extends ListLayoutPage<Project> {
       spiders: await row.locator(this.spidersColumn).innerText(),
       description: await row.locator(this.descriptionColumn).innerText(),
     } as Project;
+  }
+
+  async clickViewSpiders(rowIndex: number) {
+    await this.clickShowMore(rowIndex);
+    await this.clickContextMenuItem(this.viewSpidersButton);
+    await this.waitForDetailPageLoad();
   }
 }
 

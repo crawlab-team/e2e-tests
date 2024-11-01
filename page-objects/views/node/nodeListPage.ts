@@ -13,16 +13,25 @@ export class NodeListPage extends ListLayoutPage<Node> {
   private nodeStatusFilter = '#filter-select-status .el-select';
   private nodeEnabledFilter = '#filter-select-enabled .el-select';
 
-  async filterByNodeType(type: string) {
+  async filterByNodeType(type: string, wait = 1000) {
     await this.selectOption(this.nodeTypeFilter, type);
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
   }
 
-  async filterByNodeStatus(status: string) {
+  async filterByNodeStatus(status: string, wait = 1000) {
     await this.selectOption(this.nodeStatusFilter, status);
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
   }
 
-  async filterByNodeEnabled(enabled: string) {
+  async filterByNodeEnabled(enabled: string, wait = 1000) {
     await this.selectOption(this.nodeEnabledFilter, enabled);
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
   }
 
   // Getters

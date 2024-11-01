@@ -32,17 +32,25 @@ export default abstract class ListLayoutPage<T extends BaseModel> extends Normal
     await this.page.waitForSelector(this.listContainer);
   }
 
+  async waitForDetailPageLoad() {
+    await this.page.waitForSelector('.detail-layout');
+  }
+
   async navigateToDetail(rowIndex: number) {
     const row = this.page.locator(this.tableRows).nth(rowIndex);
     await row.locator(this.viewButton).click();
+    await this.waitForDetailPageLoad();
   }
 
   async clearSearch() {
     await this.page.fill(this.searchInput, '');
   }
 
-  async searchRows(searchTerm: string) {
+  async searchRows(searchTerm: string, wait = 1000) {
     await this.page.fill(this.searchInput, searchTerm);
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
   }
 
   async clickCreate() {
@@ -54,22 +62,31 @@ export default abstract class ListLayoutPage<T extends BaseModel> extends Normal
     await row.locator(this.showMoreButton).click();
   }
 
-  async deleteRow(rowIndex: number) {
+  async deleteRow(rowIndex: number, wait = 1000) {
     await this.clickShowMore(rowIndex);
     await this.clickContextMenuItem(this.deleteButton);
     await this.page.click(this.deleteConfirmButton);
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
   }
 
-  async createRow(form: T) {
+  async createRow(form: T, wait = 1000) {
     await this.clickCreate();
     await this.formPage.fillForm(form);
     await this.confirm();
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
   }
 
-  async createRowWithRandomName(form: T) {
+  async createRowWithRandomName(form: T, wait = 1000) {
     const randomName = `${form.name} ${Date.now()}`;
     const formWithRandomName: T = { ...form, name: randomName };
     await this.createRow(formWithRandomName);
+    if (wait) {
+      await this.page.waitForTimeout(wait);
+    }
     return formWithRandomName;
   }
 

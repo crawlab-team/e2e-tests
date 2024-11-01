@@ -16,25 +16,21 @@ test.beforeAll(async ({ browser }) => {
 
 test.describe('Project List Tests', () => {
   let projectListPage: ProjectListPage;
-  let projectFormPage: ProjectFormPage;
 
   test.beforeEach(async ({ page }) => {
     projectListPage = new ProjectListPage(page);
-    projectFormPage = new ProjectFormPage(page);
     await projectListPage.navigate();
   });
 
   test.describe.serial(CATEGORY_CREATE_DELETE_ROW, { tag: TAG_PRIORITY_HIGH }, () => {
     let project: Project;
 
-    test('should create a new project', async ({ page }) => {
+    test('should create a new project', async () => {
       // Fill out the project form
       project = await projectListPage.createRowWithRandomName(projectData.single as Project);
-      await page.waitForTimeout(1000);
 
       // Search for the new project
       await projectListPage.searchRows(project.name);
-      await page.waitForTimeout(1000); // Wait for search results
 
       // Verify the new project appears in the list
       const lastProjectData = await projectListPage.getTableRow(0);
@@ -42,14 +38,12 @@ test.describe('Project List Tests', () => {
       expect(lastProjectData.description).toBe(project.description);
     });
 
-    test('should delete a project', async ({ page }) => {
+    test('should delete a project', async () => {
       // Search for the project to delete
       await projectListPage.searchRows(project.name);
-      await page.waitForTimeout(1000); // Wait for search results
 
       // Delete the project
       await projectListPage.deleteRow(0);
-      await page.waitForTimeout(1000); // Wait for deletion to process
 
       // Verify the project has been deleted
       expect(await projectListPage.getTableRowCount()).toBe(0);
@@ -57,12 +51,18 @@ test.describe('Project List Tests', () => {
   });
 
   test.describe(CATEGORY_ROW_ACTIONS, { tag: TAG_PRIORITY_MEDIUM }, () => {
+    test.beforeEach(async () => {
+      await projectListPage.searchRows(project.name);
+    });
+
     test('should navigate to project detail', async ({ page }) => {
-      const projectCount = await projectListPage.getTableRowCount();
-      expect(projectCount).toBeGreaterThan(0);
       await projectListPage.navigateToDetail(0);
-      await page.waitForSelector('.detail-layout');
       expect(page.url()).toMatch(/\/projects\/[0-9a-f]{24}/);
+    });
+
+    test('should navigate to project spiders view', async ({ page }) => {
+      await projectListPage.clickViewSpiders(0);
+      expect(page.url()).toMatch(/\/projects\/[0-9a-f]{24}\/spiders/);
     });
   });
 
