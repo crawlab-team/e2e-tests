@@ -18,19 +18,13 @@ export class SpiderListPage extends ListLayoutPage<Spider> {
   private descriptionColumn = '.description';
   private runButton = '.run-btn';
   private uploadFilesButton = '.upload-files-btn';
+  private viewTasksButton = '.view-tasks-btn';
+  private viewSchedulesButton = '.view-schedules-btn';
   private viewDataButton = '.view-data-btn';
   private projectFilterSelector = '#filter-select-project';
 
   async filterByProject(projectName: string) {
     await this.selectOptionByText(this.projectFilterSelector, projectName);
-  }
-
-  async isCreateEditSpiderDialogVisible() {
-    return await this.page.isVisible('.create-edit-spider-dialog');
-  }
-
-  async isRunSpiderDialogVisible() {
-    return await this.page.isVisible('[custom-class*="run-spider-dialog"]');
   }
 
   async isUploadSpiderFilesDialogVisible() {
@@ -48,11 +42,23 @@ export class SpiderListPage extends ListLayoutPage<Spider> {
   }
 
   async clickUploadFiles(rowIndex: number) {
-    await this.page.locator(this.tableRows).nth(rowIndex).locator(this.uploadFilesButton).click();
+    await this.clickShowMore(rowIndex);
+    await this.clickContextMenuItem(this.uploadFilesButton);
+  }
+
+  async clickViewTasks(rowIndex: number) {
+    await this.clickShowMore(rowIndex);
+    await this.clickContextMenuItem(this.viewTasksButton);
+  }
+
+  async clickViewSchedules(rowIndex: number) {
+    await this.clickShowMore(rowIndex);
+    await this.clickContextMenuItem(this.viewSchedulesButton);
   }
 
   async clickViewData(rowIndex: number) {
-    await this.page.locator(this.tableRows).nth(rowIndex).locator(this.viewDataButton).click();
+    await this.clickShowMore(rowIndex);
+    await this.clickContextMenuItem(this.viewDataButton);
   }
 
   async getTableRow(rowIndex: number) {

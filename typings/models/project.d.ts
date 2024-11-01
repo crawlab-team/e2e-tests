@@ -1,6 +1,5 @@
 export declare global {
-  interface Project {
-    name: string;
+  interface Project extends BaseModel {
     description: string;
     spiders: string;
   }

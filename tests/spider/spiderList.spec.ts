@@ -8,15 +8,56 @@ import path from 'path';
 import projectData from '@/fixtures/projectData.json';
 import { ProjectListPage } from '@/page-objects/views/project/projectListPage';
 
+let spider: Spider;
+let project: Project;
+
 test.beforeAll(async ({ browser }) => {
   const page = await browser.newPage();
-  const spiderListPage = new SpiderListPage(page);
-  await spiderListPage.navigate();
-  await spiderListPage.createRow(spiderData.single as Spider);
 
   // Create a project to associate with the spider
   const projectListPage = new ProjectListPage(page);
-  await projectListPage.createRow(projectData.single as Project);
+  project = await projectListPage.createRowWithRandomName(projectData.single as Project);
+
+  // Create a spider
+  const spiderListPage = new SpiderListPage(page);
+  await spiderListPage.navigate();
+  spider = await spiderListPage.createRowWithRandomName({
+    ...spiderData.single as Spider,
+    project: project.name,
+  });
+
+  // Close the browser
+  await page.close();
+});
+
+test.afterAll(async ({ browser }) => {
+  test.slow();
+
+  // Open a new page
+  const page = await browser.newPage();
+
+  // Delete the spider
+  const spiderListPage = new SpiderListPage(page);
+  await spiderListPage.navigate();
+  await spiderListPage.searchRows(spider.name);
+  await page.waitForTimeout(1000); // Wait for search results
+  if (await spiderListPage.getTableRowCount() > 0) {
+    await spiderListPage.deleteRow(0);
+    await page.waitForTimeout(1000); // Wait for deletion to process
+  }
+
+  // Delete the project
+  const projectListPage = new ProjectListPage(page);
+  await projectListPage.navigate();
+  await projectListPage.searchRows(project.name);
+  await page.waitForTimeout(1000); // Wait for search results
+  if (await projectListPage.getTableRowCount() > 0) {
+    await projectListPage.deleteRow(0);
+    await page.waitForTimeout(1000); // Wait for deletion to process
+  }
+
+  // Close the browser
+  await page.close();
 });
 
 test.describe('Spider List Tests', () => {
@@ -28,17 +69,19 @@ test.describe('Spider List Tests', () => {
   });
 
   test.describe.serial(CATEGORY_CREATE_DELETE_ROW, { tag: TAG_PRIORITY_CRITICAL }, () => {
-    test('should create a new spider', async ({ page }) => {
-      const spider = spiderData.create as Spider;
-      const initialCount = await spiderListPage.getTotalCount();
+    let spider: Spider;
 
-      await spiderListPage.createRow(spider);
+    test('should create a new spider', async ({ page }) => {
+      // Create a new spider
+      spider = await spiderListPage.createRowWithRandomName(spiderData.single as Spider);
 
       // Wait for the new spider to appear in the list
+      await page.reload();
       await page.waitForTimeout(1000);
 
-      const newCount = await spiderListPage.getTotalCount();
-      expect(newCount).toBe(initialCount + 1);
+      // Search for the new spider
+      await spiderListPage.searchRows(spider.name);
+      await page.waitForTimeout(1000); // Wait for search results
 
       // Verify the new spider appears in the list
       const lastSpiderData = await spiderListPage.getTableRow(0);
@@ -48,18 +91,16 @@ test.describe('Spider List Tests', () => {
     });
 
     test('should delete a spider', async ({ page }) => {
-      const initialCount = await spiderListPage.getTotalCount();
-      expect(initialCount).toBeGreaterThan(0);
-
-      await spiderListPage.searchRows(spiderData.create.name);
+      // Search for the spider to delete
+      await spiderListPage.searchRows(spider.name);
       await page.waitForTimeout(1000); // Wait for search results
+
+      // Delete the spider
       await spiderListPage.deleteRow(0);
       await page.waitForTimeout(1000); // Wait for deletion to process
-      await page.reload();
-      await page.waitForTimeout(1000); // Wait for the page to reload
 
-      const newCount = await spiderListPage.getTotalCount();
-      expect(newCount).toBe(initialCount - 1);
+      // Verify the spider has been deleted
+      expect(await spiderListPage.getTableRowCount()).toBe(0);
     });
   });
 
@@ -67,23 +108,25 @@ test.describe('Spider List Tests', () => {
     test('should run a spider', async ({ page }) => {
       test.slow();
 
-      const spider = spiderData.single as Spider;
-
+      // Search for the spider and run it
+      await spiderListPage.searchRows(spider.name);
       const spiderCount = await spiderListPage.getTableRowCount();
       expect(spiderCount).toBeGreaterThan(0);
-
-      await spiderListPage.searchRows(spider.name);
       await spiderListPage.runSpider(0);
 
-      // Refresh the page to get the latest data
+      // Reload the page and verify the spider has been run
       await page.reload();
       await page.waitForTimeout(1000); // Wait for the page to reload
 
       // Verify the spider has been run
       await spiderListPage.searchRows(spider.name);
+      await page.waitForTimeout(1000); // Wait for search results
       const lastSpider = await spiderListPage.getTableRow(0);
       expect(lastSpider.last_status).toBeTruthy();
       expect(lastSpider.stats).toBeTruthy();
+
+      // Delete the spider
+      await spiderListPage.deleteRow(0);
     });
 
     test('should navigate to spider detail', async ({ page }) => {
@@ -92,6 +135,22 @@ test.describe('Spider List Tests', () => {
       await spiderListPage.navigateToDetail(0);
       await page.waitForSelector('.detail-layout');
       expect(page.url()).toMatch(/\/spiders\/[0-9a-f]{24}/);
+    });
+
+    test('should navigate to spider tasks view', async ({ page }) => {
+      const spiderCount = await spiderListPage.getTableRowCount();
+      expect(spiderCount).toBeGreaterThan(0);
+      await spiderListPage.clickViewTasks(0);
+      await page.waitForSelector('.detail-layout');
+      expect(page.url()).toMatch(/\/spiders\/[0-9a-f]{24}\/tasks/);
+    });
+
+    test('should navigate to spider schedules view', async ({ page }) => {
+      const spiderCount = await spiderListPage.getTableRowCount();
+      expect(spiderCount).toBeGreaterThan(0);
+      await spiderListPage.clickViewSchedules(0);
+      await page.waitForSelector('.detail-layout');
+      expect(page.url()).toMatch(/\/spiders\/[0-9a-f]{24}\/schedules/);
     });
 
     test('should navigate to spider data view', async ({ page }) => {
@@ -167,14 +226,13 @@ test.describe('Spider List Tests', () => {
     });
 
     test('should filter spiders by project', async ({ page }) => {
-      const projectName = 'Test Project';
-      await spiderListPage.filterByProject(projectName);
+      await spiderListPage.filterByProject(spider.project);
       await page.waitForTimeout(1000); // Wait for filter results
 
       const spiderCount = await spiderListPage.getTableRowCount();
       if (spiderCount > 0) {
         const firstSpiderData = await spiderListPage.getTableRow(0);
-        expect(firstSpiderData.project).toBe(projectName);
+        expect(firstSpiderData.project).toBe(spider.project);
       } else {
         // If no spiders found, that's okay too
         expect(spiderCount).toBe(0);

@@ -14,11 +14,6 @@ export class ProjectListPage extends ListLayoutPage<Project> {
   private spidersColumn = 'td:nth-child(3)';
   private descriptionColumn = 'td:nth-child(4)';
 
-  async createRow(form: Project) {
-    await this.clickCreate();
-    await this.formPage.fillForm(form);
-  }
-
   async getTableRow(rowIndex: number) {
     const row = this.page.locator(this.tableRows).nth(rowIndex);
     return {

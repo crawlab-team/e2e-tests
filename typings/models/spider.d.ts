@@ -1,6 +1,5 @@
 export declare global {
-  interface Spider {
-    name: string;
+  interface Spider extends BaseModel {
     project: string;
     git: string;
     last_status: string;

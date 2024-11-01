@@ -2,7 +2,7 @@ import NormalLayoutPage from '@/page-objects/layout/normalLayoutPage';
 import { FormPage } from '@/page-objects/components/form/formPage';
 import { Page } from '@playwright/test';
 
-export default abstract class ListLayoutPage<T> extends NormalLayoutPage {
+export default abstract class ListLayoutPage<T extends BaseModel> extends NormalLayoutPage {
   protected abstract path: string;
   protected formPage: FormPage<T>;
 
@@ -15,10 +15,10 @@ export default abstract class ListLayoutPage<T> extends NormalLayoutPage {
 
   protected listContainer = '.list-layout';
   protected createButton = '#add-btn';
-  protected confirmButton = '#confirm-btn';
   protected searchInput = '#filter-search .el-input input';
   protected tableRows = '.list-layout table tbody tr';
   protected viewButton = '.view-btn';
+  protected showMoreButton = '.show-more';
   protected deleteButton = '.delete-btn';
   protected deleteConfirmButton = '.delete-confirm-btn';
 
@@ -49,13 +49,14 @@ export default abstract class ListLayoutPage<T> extends NormalLayoutPage {
     await this.page.click(this.createButton);
   }
 
-  async confirm() {
-    await this.page.click(this.confirmButton);
+  async clickShowMore(rowIndex: number) {
+    const row = this.page.locator(this.tableRows).nth(rowIndex);
+    await row.locator(this.showMoreButton).click();
   }
 
   async deleteRow(rowIndex: number) {
-    const row = this.page.locator(this.tableRows).nth(rowIndex);
-    await row.locator(this.deleteButton).click();
+    await this.clickShowMore(rowIndex);
+    await this.clickContextMenuItem(this.deleteButton);
     await this.page.click(this.deleteConfirmButton);
   }
 
@@ -63,6 +64,13 @@ export default abstract class ListLayoutPage<T> extends NormalLayoutPage {
     await this.clickCreate();
     await this.formPage.fillForm(form);
     await this.confirm();
+  }
+
+  async createRowWithRandomName(form: T) {
+    const randomName = `${form.name} ${Date.now()}`;
+    const formWithRandomName: T = { ...form, name: randomName };
+    await this.createRow(formWithRandomName);
+    return formWithRandomName;
   }
 
   async getTableRowCount(): Promise<number> {

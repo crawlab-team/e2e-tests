@@ -1,6 +1,5 @@
 export declare global {
-  interface Node {
-    name: string;
+  interface Node extends BaseModel {
     type: string;
     status: string;
     enabled: string;

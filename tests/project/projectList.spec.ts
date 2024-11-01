@@ -5,11 +5,13 @@ import { TAG_PRIORITY_HIGH, TAG_PRIORITY_MEDIUM } from '@/constants/priority';
 import projectData from '@/fixtures/projectData.json';
 import { CATEGORY_CREATE_DELETE_ROW, CATEGORY_FILTER_ROWS, CATEGORY_ROW_ACTIONS } from '@/constants/category';
 
+let project: Project;
+
 test.beforeAll(async ({ browser }) => {
   const page = await browser.newPage();
   const projectListPage = new ProjectListPage(page);
   await projectListPage.navigate();
-  await projectListPage.createRow(projectData.single as Project);
+  project = await projectListPage.createRowWithRandomName(projectData.single as Project);
 });
 
 test.describe('Project List Tests', () => {
@@ -23,37 +25,34 @@ test.describe('Project List Tests', () => {
   });
 
   test.describe.serial(CATEGORY_CREATE_DELETE_ROW, { tag: TAG_PRIORITY_HIGH }, () => {
+    let project: Project;
+
     test('should create a new project', async ({ page }) => {
-      const initialCount = await projectListPage.getTableRowCount();
-      await projectListPage.clickCreate();
-
       // Fill out the project form
-      await projectFormPage.fillForm(projectData.single as Project);
-
-      // Submit the form (you might need to implement this method in ProjectListPage)
-      await projectListPage.confirm();
-
-      // Wait for the new project to appear in the list
+      project = await projectListPage.createRowWithRandomName(projectData.single as Project);
       await page.waitForTimeout(1000);
 
-      const newCount = await projectListPage.getTableRowCount();
-      expect(newCount).toBe(initialCount + 1);
+      // Search for the new project
+      await projectListPage.searchRows(project.name);
+      await page.waitForTimeout(1000); // Wait for search results
 
       // Verify the new project appears in the list
       const lastProjectData = await projectListPage.getTableRow(0);
-      expect(lastProjectData.name).toBe(projectData.single.name);
-      expect(lastProjectData.description).toBe(projectData.single.description);
+      expect(lastProjectData.name).toBe(project.name);
+      expect(lastProjectData.description).toBe(project.description);
     });
 
     test('should delete a project', async ({ page }) => {
-      const projectCount = await projectListPage.getTableRowCount();
-      expect(projectCount).toBeGreaterThan(0);
-      const initialCount = projectCount;
-      await projectListPage.deleteRow(0);
+      // Search for the project to delete
+      await projectListPage.searchRows(project.name);
+      await page.waitForTimeout(1000); // Wait for search results
 
+      // Delete the project
+      await projectListPage.deleteRow(0);
       await page.waitForTimeout(1000); // Wait for deletion to process
-      const newCount = await projectListPage.getTableRowCount();
-      expect(newCount).toBe(initialCount - 1);
+
+      // Verify the project has been deleted
+      expect(await projectListPage.getTableRowCount()).toBe(0);
     });
   });
 
