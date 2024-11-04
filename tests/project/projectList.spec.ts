@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { ProjectListPage } from '@/page-objects/views/project/projectListPage';
-import { ProjectFormPage } from '@/page-objects/views/project/projectFormPage';
 import { TAG_PRIORITY_HIGH, TAG_PRIORITY_MEDIUM } from '@/constants/priority';
 import projectData from '@/fixtures/projectData.json';
 import { CATEGORY_CREATE_DELETE_ROW, CATEGORY_FILTER_ROWS, CATEGORY_ROW_ACTIONS } from '@/constants/category';
@@ -12,6 +11,24 @@ test.beforeAll(async ({ browser }) => {
   const projectListPage = new ProjectListPage(page);
   await projectListPage.navigate();
   project = await projectListPage.createRowWithRandomName(projectData.single as Project);
+});
+
+test.afterAll(async ({ browser }) => {
+  test.slow();
+
+  // Open a new page
+  const page = await browser.newPage();
+
+  // Delete the project
+  const projectListPage = new ProjectListPage(page);
+  await projectListPage.navigate();
+  await projectListPage.searchRows(project.name);
+  if (await projectListPage.getTableRowCount() > 0) {
+    await projectListPage.deleteRow(0);
+  }
+
+  // Close the browser
+  await page.close();
 });
 
 test.describe('Project List Tests', () => {

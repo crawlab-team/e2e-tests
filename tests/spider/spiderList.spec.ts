@@ -12,6 +12,8 @@ let spider: Spider;
 let project: Project;
 
 test.beforeAll(async ({ browser }) => {
+  test.slow();
+
   const page = await browser.newPage();
 
   // Create a project to associate with the spider
@@ -41,20 +43,16 @@ test.afterAll(async ({ browser }) => {
   const spiderListPage = new SpiderListPage(page);
   await spiderListPage.navigate();
   await spiderListPage.searchRows(spider.name);
-  await page.waitForTimeout(1000); // Wait for search results
   if (await spiderListPage.getTableRowCount() > 0) {
     await spiderListPage.deleteRow(0);
-    await page.waitForTimeout(1000); // Wait for deletion to process
   }
 
   // Delete the project
   const projectListPage = new ProjectListPage(page);
   await projectListPage.navigate();
   await projectListPage.searchRows(project.name);
-  await page.waitForTimeout(1000); // Wait for search results
   if (await projectListPage.getTableRowCount() > 0) {
     await projectListPage.deleteRow(0);
-    await page.waitForTimeout(1000); // Wait for deletion to process
   }
 
   // Close the browser
@@ -207,7 +205,7 @@ test.describe('Spider List Tests', () => {
   });
 
   test.describe(CATEGORY_FILTER_ROWS, { tag: TAG_PRIORITY_MEDIUM }, () => {
-    test('should search for a spider', async ({ page }) => {
+    test('should search for a spider', async () => {
       await spiderListPage.searchRows(spider.name);
 
       // Verify the spider appears in the list
@@ -217,7 +215,7 @@ test.describe('Spider List Tests', () => {
       expect(firstSpiderData.name).toContain(spider.name);
     });
 
-    test('should filter spiders by project', async ({ page }) => {
+    test('should filter spiders by project', async () => {
       await spiderListPage.filterByProject(spider.project);
 
       // Verify the spiders are filtered by project
