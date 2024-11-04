@@ -13,7 +13,7 @@ export class SpiderFormPage extends FormPage<Spider> {
   private nodeCheckTagGroup = '[data-test="nodes"] .cl-check-tag-group';
   private descriptionTextarea = '[data-test="description"] textarea';
 
-  async fillForm({name, project, cmd, description}: Spider) {
+  async fillForm({ name, project, cmd, description }: Spider) {
     await this.setName(name);
     await this.setProject(project);
     await this.setCommand(cmd);
@@ -25,7 +25,9 @@ export class SpiderFormPage extends FormPage<Spider> {
   }
 
   async setProject(project: string) {
-    await this.selectOptionByText(this.projectSelect, project, this.projectSelectDropdown);
+    if (project) {
+      await this.selectOptionByText(this.projectSelect, project, this.projectSelectDropdown);
+    }
   }
 
   async setCommand(cmd: string) {

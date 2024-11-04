@@ -2,13 +2,7 @@
   "single": {
     "name": "Test Spider",
     "description": "This is a test spider",
-    "project": "Test Project",
-    "cmd": "python main.py"
-  },
-  "create": {
-    "name": "Create Spider",
-    "description": "This is a test spider for create",
-    "project": "Test Project",
+    "project": "",
     "cmd": "python main.py"
   }
 }
