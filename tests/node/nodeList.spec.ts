@@ -30,7 +30,21 @@ test.describe('Node List Tests', () => {
       expect(firstNodeData.type).toContain('Master' || '主节点');
     });
 
-    test('should filter nodes by status', async ({ page }) => {
+    test('should filter nodes by type', async () => {
+      // Update the test to filter by type 'true' (Master)
+      await nodeListPage.filterByNodeType('true');
+      expect(await nodeListPage.getNodeCount()).toBeGreaterThan(0);
+      const masterNodeData = await nodeListPage.getTableRow(0);
+      expect(masterNodeData.status).toBe('Master' || '主节点');
+
+      // Update the test to filter by type 'false' (Worker)
+      await nodeListPage.filterByNodeType('false');
+      expect(await nodeListPage.getNodeCount()).toBeGreaterThan(0);
+      const workerNodeData = await nodeListPage.getTableRow(0);
+      expect(workerNodeData.status).toBe('Worker' || '工作节点');
+    });
+
+    test('should filter nodes by status', async () => {
       await nodeListPage.filterByNodeStatus('on');
       const nodeCount = await nodeListPage.getNodeCount();
       expect(nodeCount).toBeGreaterThan(0);
@@ -52,7 +66,7 @@ test.describe('Node List Tests', () => {
       expect(firstNodeData.name).toContain(searchTerm);
     });
 
-    test('should search for a non-existent node', async ({ page }) => {
+    test('should search for a non-existent node', async () => {
       const searchTerm = 'Non-Existent Node';
       await nodeListPage.searchRows(searchTerm);
 
