@@ -22,15 +22,6 @@ test.describe('Node List Tests', () => {
 
   test.describe(CATEGORY_FILTER_ROWS, { tag: TAG_PRIORITY_MEDIUM }, () => {
     test('should filter nodes by type', async () => {
-      await nodeListPage.filterByNodeType('true');
-      const nodeCount = await nodeListPage.getNodeCount();
-      expect(nodeCount).toBeGreaterThan(0);
-
-      const firstNodeData = await nodeListPage.getTableRow(0);
-      expect(firstNodeData.type).toContain('Master' || '主节点');
-    });
-
-    test('should filter nodes by type', async () => {
       // Update the test to filter by type 'true' (Master)
       await nodeListPage.filterByNodeType('true');
       expect(await nodeListPage.getNodeCount()).toBeGreaterThan(0);
