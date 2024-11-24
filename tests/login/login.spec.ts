@@ -1,5 +1,6 @@
-import { test as base, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { LoginPage } from '@/page-objects/views/login/loginPage';
+import { test as base } from '@/test-utils/base-fixtures';
 import userData from '@/fixtures/userData.json';
 import { TAG_PRIORITY_CRITICAL } from '@/constants/priority';
 
